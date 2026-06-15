@@ -4,7 +4,6 @@ import SignIn from "../components/SignIn";
 
 import { useAuth } from "../hooks/useAuth";
 import { usePayments } from "../hooks/usePayments";
-import { axiosClient } from "../lib/axiosClient.ts";
 
 const Shop = () => {
   const {
@@ -15,23 +14,15 @@ const Shop = () => {
     signOut,
     closeSignIn,
     requireAuth,
-    isLoading: isAuthLoading,
+    isAuthLoading: isAuthLoading,
   } = useAuth();
 
-  const { orderProduct, isLoading } = usePayments({
+  const { orderProduct, isAuthLoading: isPaymentLoading } = usePayments({
     isAuthenticated,
     onRequireAuth: requireAuth,
   });
 
-  const onSendTestNotification = () => {
-    const notification = {
-      title: "Test Notification",
-      body: "This is a test notification",
-      user_uid: user?.uid,
-      subroute: "/shop",
-    };
-    axiosClient.post("/notifications/send", { notifications: [notification] });
-  };
+  const isLoading = isAuthLoading || isPaymentLoading;
 
   return (
     <>
@@ -39,31 +30,31 @@ const Shop = () => {
         user={user}
         onSignIn={signIn}
         onSignOut={signOut}
-        onSendTestNotification={onSendTestNotification}
-        isLoading={isAuthLoading}
+        isAuthLoading={isAuthLoading}
       />
 
-      <ProductCard
-        name="Apple Pie"
-        description="You know what this is. Pie. Apples. Apple pie."
-        price={0.1}
-        pictureURL="https://upload.wikimedia.org/wikipedia/commons/4/4b/Apple_pie.jpg"
-        onClickBuy={() => orderProduct("Order Apple Pie", 0.1, { productId: "apple_pie_1" })}
-        disabled={isLoading}
-      />
+      {/* 아르카디아 아이템 섹션 */}
+      <div style={{ padding: "20px" }}>
+        <h1>아르카디아 상점</h1>
+        
+        <ProductCard
+          name="아르카디아의 전설적인 검"
+          description="강력한 공격력을 가진 아르카디아의 핵심 아이템입니다."
+          price={10} 
+          pictureURL="https://via.placeholder.com/150" 
+          onClickBuy={() => orderProduct("아르카디아 검 결제", 10, { productId: "arcadia_sword_001" })}
+          disabled={isLoading}
+        />
 
-      <ProductCard
-        name="Lemon Meringue Pie"
-        description="Order at your own risk."
-        price={0.2}
-        pictureURL="https://live.staticflickr.com/1156/5134246283_f2686ff8a8_b.jpg"
-        onClickBuy={() =>
-          orderProduct("Order Lemon Meringue Pie", 0.2, {
-            productId: "lemon_pie_1",
-          })
-        }
-        disabled={isLoading}
-      />
+        <ProductCard
+          name="아르카디아 생명 물약"
+          description="체력을 100 회복시켜주는 필수 아이템입니다."
+          price={2}
+          pictureURL="https://via.placeholder.com/150"
+          onClickBuy={() => orderProduct("물약 결제", 2, { productId: "arcadia_potion_001" })}
+          disabled={isLoading}
+        />
+      </div>
 
       {showSignIn && <SignIn onSignIn={signIn} onModalClose={closeSignIn} disabled={isAuthLoading} />}
     </>
